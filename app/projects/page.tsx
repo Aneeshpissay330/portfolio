@@ -14,7 +14,7 @@ export default function Projects() {
                             <ProjectCard
                                 title={project.title}
                                 description={project.description}
-                                image={`/api/screenshot?url=${encodeURIComponent(project.url)}`}
+                                image={project.image}
                                 tags={project.technologies}
                                 demoUrl={project.url}
                                 githubUrl={project.githubUrl}

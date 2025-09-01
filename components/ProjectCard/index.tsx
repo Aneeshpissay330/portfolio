@@ -1,9 +1,9 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 
 interface ProjectCardProps {
     title: string;
     description: string;
-    image: string;
+    image: StaticImageData;
     tags: string[];
     demoUrl?: string;
     githubUrl?: string;
@@ -26,7 +26,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     alt={title}
                     width={600}
                     height={400}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                 />
             </div>
 
