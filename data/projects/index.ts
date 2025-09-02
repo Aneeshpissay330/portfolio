@@ -2,6 +2,7 @@ import todoAppImage from "@/public/projects/todo-app.png";
 import bmiAppImage from "@/public/projects/bmi-app.png";
 import codeEditorImage from "@/public/projects/code-editor.png";
 import photoEditorImage from "@/public/projects/photo-editor.png";
+import weatherAppImage from "@/public/projects/weather-app.png"; // ✅ add your screenshot here
 
 export const projects = [
     {
@@ -28,12 +29,20 @@ export const projects = [
         url: "https://code-editor-dun-nine.vercel.app/",
         githubUrl: "https://github.com/Aneeshpissay330/code-editor"
     },
-     {
+    {
         title: "Photo Editor",
         description: "A simple photo editor web app to upload images and apply adjustments like brightness, contrast, saturation, blur, and filters.",
         technologies: ["React", "TypeScript", "Tailwind CSS"],
         image: photoEditorImage,
         url: "https://photo-editor-sepia.vercel.app/",
         githubUrl: "https://github.com/Aneeshpissay330/photo-editor"
+    },
+    {
+        title: "Weather Dashboard",
+        description: "A modern weather dashboard where users can search for any city and view current weather conditions along with a 5-day forecast, built with React and Tailwind CSS.",
+        technologies: ["React", "TypeScript", "Tailwind CSS", "OpenWeatherMap API"],
+        image: weatherAppImage,
+        url: "https://weather-app-tau-coral-74.vercel.app/",
+        githubUrl: "https://github.com/Aneeshpissay330/weather-app"
     }
 ];
