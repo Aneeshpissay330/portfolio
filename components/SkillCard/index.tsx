@@ -1,31 +1,34 @@
-import Image from "next/image";
 import Link from "next/link";
+import Icon from '@mdi/react';
 
 interface SkillCardProps {
-  icon: string;        // URL or /public path
+  icon: string;        // MDI icon path
   size?: number;       // Container size (default 80px)
   border?: boolean;    // Toggle border (default true)
   href?: string;       // Optional link
+  color?: string;      // Icon color (hex value)
+  label?: string;      // Skill label to display
 }
 
-const SkillCard: React.FC<SkillCardProps> = ({ icon, size = 80, border = true, href }) => {
+const SkillCard: React.FC<SkillCardProps> = ({ icon, size = 80, border = true, href, color = "#6B7280", label }) => {
   const CardContent = (
     <div
       className={`bg-white p-6 text-center hover:border-gray-300 transition-colors 
         ${border ? "border border-gray-200" : ""}`}
     >
       <div
-        className="flex items-center justify-center mx-auto"
+        className="flex items-center justify-center mx-auto mb-3"
         style={{ width: size, height: size }}
       >
-        <Image
-          src={icon}
-          alt="Skill Icon"
-          width={256}
-          height={256}
-          className="object-contain"
+        <Icon
+          path={icon}
+          size={size / 20} // Convert px to relative size for MDI
+          style={{ color }}
         />
       </div>
+      {label && (
+        <p className="text-sm font-medium text-gray-700 mt-2">{label}</p>
+      )}
     </div>
   );
 

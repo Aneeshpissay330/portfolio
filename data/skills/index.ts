@@ -1,71 +1,96 @@
+import {
+  mdiReact,
+  mdiLanguageTypescript,
+  mdiLanguageJavascript,
+  mdiNodejs,
+  mdiDatabase,
+  mdiAws,
+  mdiKubernetes,
+  mdiGit,
+  mdiDocker,
+  mdiAndroid,
+} from '@mdi/js';
+
 export const skills = [
   // 🖥️ Frontend
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original-wordmark.svg",
+    icon: mdiReact,
     label: "React",
     category: "Frontend",
+    color: "#61DAFB", // React blue
   },
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original-wordmark.svg",
+    icon: mdiReact, // Next.js uses React icon as fallback
     label: "Next.js",
     category: "Frontend",
+    color: "#000000", // Next.js black
   },
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/reactnative/reactnative-original-wordmark.svg",
+    icon: mdiReact, // React Native uses React icon
     label: "React Native",
     category: "Frontend",
+    color: "#61DAFB", // React Native blue (same as React)
   },
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/android/android-plain-wordmark.svg",
+    icon: mdiAndroid,
     label: "Android",
     category: "Frontend",
+    color: "#3DDC84", // Android green
   },
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-plain.svg",
+    icon: mdiLanguageTypescript,
     label: "TypeScript",
     category: "Frontend",
+    color: "#3178C6", // TypeScript blue
   },
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-plain.svg",
+    icon: mdiLanguageJavascript,
     label: "JavaScript",
     category: "Frontend",
+    color: "#F7DF1E", // JavaScript yellow
   },
 
   // ⚙️ Backend
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-plain-wordmark.svg",
+    icon: mdiNodejs,
     label: "Node.js",
     category: "Backend",
+    color: "#339933", // Node.js green
   },
 
   // 🗄️ Database
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-plain-wordmark.svg",
+    icon: mdiDatabase,
     label: "MongoDB",
     category: "Database",
+    color: "#47A248", // MongoDB green
   },
 
   // ☁️ Cloud / DevOps
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg",
+    icon: mdiAws,
     label: "AWS",
     category: "Cloud / DevOps",
+    color: "#FF9900", // AWS orange
   },
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain-wordmark.svg",
+    icon: mdiKubernetes,
     label: "Kubernetes",
     category: "Cloud / DevOps",
+    color: "#326CE5", // Kubernetes blue
   },
 
   // 🛠️ Tools
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-plain-wordmark.svg",
+    icon: mdiGit,
     label: "Git",
     category: "Tools",
+    color: "#F05032", // Git red/orange
   },
   {
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-plain-wordmark.svg",
+    icon: mdiDocker,
     label: "Docker",
     category: "Tools",
+    color: "#2496ED", // Docker blue
   },
 ];

@@ -1,4 +1,7 @@
 import Image, { StaticImageData } from "next/image";
+import Link from "next/link";
+import Icon from '@mdi/react';
+import { mdiOpenInNew, mdiGithub, mdiShieldAccount } from '@mdi/js';
 
 interface ProjectCardProps {
   title: string;
@@ -7,6 +10,7 @@ interface ProjectCardProps {
   tags: string[];
   demoUrl?: string;
   githubUrl?: string;
+  privacyPolicy?: string;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -16,6 +20,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   tags,
   demoUrl,
   githubUrl,
+  privacyPolicy,
 }) => {
   return (
     <div className="bg-white border border-gray-200 hover:border-gray-300 transition-colors">
@@ -55,7 +60,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         </div>
 
         {/* Links */}
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 flex-wrap gap-y-2">
           {demoUrl && (
             <a
               href={demoUrl}
@@ -63,7 +68,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               rel="noopener noreferrer"
               className="text-black hover:text-accent transition-colors text-sm font-medium flex items-center"
             >
-              <span className="material-symbols-outlined mr-1">open_in_new</span>
+              <Icon path={mdiOpenInNew} size={0.7} className="mr-1" />
               Live Demo
             </a>
           )}
@@ -74,15 +79,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-black transition-colors text-sm flex items-center"
             >
-              <Image
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg"
-                alt="Github"
-                width={25}
-                height={25}
-                className="object-contain mr-1"
-              />
+              <Icon path={mdiGithub} size={0.7} className="mr-1" />
               GitHub
             </a>
+          )}
+          {privacyPolicy && (
+            <Link
+              href={privacyPolicy}
+              className="text-red-600 hover:text-red-800 transition-colors text-sm flex items-center font-medium"
+            >
+              <Icon path={mdiShieldAccount} size={0.7} className="mr-1" />
+              Privacy Policy
+            </Link>
           )}
         </div>
       </div>

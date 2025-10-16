@@ -1,16 +1,12 @@
 import SkillCard from "@/components/SkillCard";
 import { Footer, NextHeader } from "@Aneeshpissay330/components-ui";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Lexend } from "next/font/google";
+import { mdiGithub, mdiLinkedin } from '@mdi/js';
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const lexend = Lexend({
+  variable: "--font-lexend",
   subsets: ["latin"],
 });
 
@@ -37,7 +33,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=optional" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${lexend.variable} antialiased`}
       >
         <NextHeader
           title="Aneesh Pissay"
@@ -45,16 +41,18 @@ export default function RootLayout({
           rightContent={
             <div className="flex items-center space-x-4">
               <SkillCard 
-                icon="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original-wordmark.svg"
+                icon={mdiGithub}
                 size={40}
                 border={false}
                 href="https://github.com/Aneeshpissay330"
+                color="#181717"
               />
               <SkillCard 
-                icon="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linkedin/linkedin-original.svg"
+                icon={mdiLinkedin}
                 size={40}
                 border={false}
                 href="https://www.linkedin.com/in/aneesh-pissay-1559a31a9"
+                color="#0A66C2"
               />
             </div>
           }

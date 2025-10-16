@@ -20,7 +20,7 @@ export default function Skills() {
         {skills
           .filter((skill) => skill.category === category)
           .map((skill, idx) => (
-            <SkillCard key={idx} icon={skill.icon} />
+            <SkillCard key={idx} icon={skill.icon} color={skill.color} label={skill.label} />
           ))}
       </div>
     ),
