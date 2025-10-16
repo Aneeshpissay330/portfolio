@@ -12,7 +12,8 @@ export const projects = [
         technologies: ["React", "TypeScript", "Tailwind CSS"],
         image: todoAppImage,
         url: "https://todo-list-eight-dusky.vercel.app/",
-        githubUrl: "https://github.com/Aneeshpissay330/todo-list"
+        githubUrl: "https://github.com/Aneeshpissay330/todo-list",
+        category: "Web"
     },
     {
         title: "BMI Calculator",
@@ -20,7 +21,8 @@ export const projects = [
         technologies: ["React", "TypeScript", "Tailwind CSS"],
         image: bmiAppImage,
         url: "https://bmi-app-six.vercel.app/",
-        githubUrl: "https://github.com/Aneeshpissay330/bmi-app"
+        githubUrl: "https://github.com/Aneeshpissay330/bmi-app",
+        category: "Web"
     },
     {
         title: "Code Editor",
@@ -28,7 +30,8 @@ export const projects = [
         technologies: ["React", "TypeScript", "Tailwind CSS"],
         image: codeEditorImage,
         url: "https://code-editor-dun-nine.vercel.app/",
-        githubUrl: "https://github.com/Aneeshpissay330/code-editor"
+        githubUrl: "https://github.com/Aneeshpissay330/code-editor",
+        category: "Web"
     },
     {
         title: "Photo Editor",
@@ -36,7 +39,8 @@ export const projects = [
         technologies: ["React", "TypeScript", "Tailwind CSS"],
         image: photoEditorImage,
         url: "https://photo-editor-sepia.vercel.app/",
-        githubUrl: "https://github.com/Aneeshpissay330/photo-editor"
+        githubUrl: "https://github.com/Aneeshpissay330/photo-editor",
+        category: "Web"
     },
     {
         title: "Weather Dashboard",
@@ -44,7 +48,8 @@ export const projects = [
         technologies: ["React", "TypeScript", "Tailwind CSS", "OpenWeatherMap API"],
         image: weatherAppImage,
         url: "https://weather-app-tau-coral-74.vercel.app/",
-        githubUrl: "https://github.com/Aneeshpissay330/weather-app"
+        githubUrl: "https://github.com/Aneeshpissay330/weather-app",
+        category: "Web"
     },
     {
         title: "Noirly Messenger",
@@ -53,6 +58,7 @@ export const projects = [
         image: noirlyMessengerImage,
         url: "https://play.google.com/store/apps/details?id=com.noirly.messenger",
         githubUrl: "https://github.com/Aneeshpissay330/noirly-messenger",
-        privacyPolicy: "/projects/noirly-messenger/privacy-policy"
+        privacyPolicy: "/projects/noirly-messenger/privacy-policy",
+        category: "Mobile"
     }
 ];

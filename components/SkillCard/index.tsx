@@ -13,8 +13,9 @@ interface SkillCardProps {
 const SkillCard: React.FC<SkillCardProps> = ({ icon, size = 80, border = true, href, color = "#6B7280", label }) => {
   const CardContent = (
     <div
-      className={`bg-white p-6 text-center hover:border-gray-300 transition-colors 
-        ${border ? "border border-gray-200" : ""}`}
+      className={`bg-card text-card-foreground spacing-generous text-center hover:bg-secondary transition-colors glass-effect ${
+        border ? "border border-border" : ""
+      }`}
     >
       <div
         className="flex items-center justify-center mx-auto mb-3"
@@ -27,7 +28,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ icon, size = 80, border = true, h
         />
       </div>
       {label && (
-        <p className="text-sm font-medium text-gray-700 mt-2">{label}</p>
+        <p className="text-sm font-medium text-muted-foreground mt-2">{label}</p>
       )}
     </div>
   );

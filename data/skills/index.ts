@@ -4,93 +4,142 @@ import {
   mdiLanguageJavascript,
   mdiNodejs,
   mdiDatabase,
-  mdiAws,
-  mdiKubernetes,
+  mdiMicrosoftAzure,
   mdiGit,
   mdiDocker,
   mdiAndroid,
+  mdiFirebase,
+  mdiTestTube,
+  mdiRocket,
+  mdiSourcePull,
+  mdiCogs,
+  mdiBug,
 } from '@mdi/js';
 
 export const skills = [
+  // � Programming Languages
+  {
+    icon: mdiLanguageJavascript,
+    label: "JavaScript",
+    category: "Frontend & Languages",
+    color: "#F7DF1E", // JavaScript yellow
+  },
+  {
+    icon: mdiLanguageTypescript,
+    label: "TypeScript",
+    category: "Frontend & Languages",
+    color: "#3178C6", // TypeScript blue
+  },
+
   // 🖥️ Frontend
   {
     icon: mdiReact,
     label: "React",
-    category: "Frontend",
+    category: "Frontend & Languages",
     color: "#61DAFB", // React blue
   },
   {
     icon: mdiReact, // Next.js uses React icon as fallback
     label: "Next.js",
-    category: "Frontend",
+    category: "Frontend & Languages",
     color: "#000000", // Next.js black
   },
+
+  // 📱 Mobile & Backend
   {
     icon: mdiReact, // React Native uses React icon
     label: "React Native",
-    category: "Frontend",
+    category: "Mobile & Backend",
     color: "#61DAFB", // React Native blue (same as React)
   },
   {
     icon: mdiAndroid,
     label: "Android",
-    category: "Frontend",
+    category: "Mobile & Backend",
     color: "#3DDC84", // Android green
   },
-  {
-    icon: mdiLanguageTypescript,
-    label: "TypeScript",
-    category: "Frontend",
-    color: "#3178C6", // TypeScript blue
-  },
-  {
-    icon: mdiLanguageJavascript,
-    label: "JavaScript",
-    category: "Frontend",
-    color: "#F7DF1E", // JavaScript yellow
-  },
 
-  // ⚙️ Backend
+  // 📱 Mobile & Backend
   {
     icon: mdiNodejs,
     label: "Node.js",
-    category: "Backend",
+    category: "Mobile & Backend",
     color: "#339933", // Node.js green
   },
+  {
+    icon: mdiFirebase,
+    label: "Firebase",
+    category: "Mobile & Backend",
+    color: "#FFCA28", // Firebase yellow
+  },
 
-  // 🗄️ Database
+  // � Mobile & Backend
   {
     icon: mdiDatabase,
     label: "MongoDB",
-    category: "Database",
+    category: "Mobile & Backend",
     color: "#47A248", // MongoDB green
   },
 
-  // ☁️ Cloud / DevOps
+  // 🚀 DevOps & Cloud
   {
-    icon: mdiAws,
-    label: "AWS",
-    category: "Cloud / DevOps",
-    color: "#FF9900", // AWS orange
-  },
-  {
-    icon: mdiKubernetes,
-    label: "Kubernetes",
-    category: "Cloud / DevOps",
-    color: "#326CE5", // Kubernetes blue
+    icon: mdiMicrosoftAzure,
+    label: "Azure",
+    category: "DevOps & Cloud",
+    color: "#0078D4", // Azure blue
   },
 
-  // 🛠️ Tools
+  // � DevOps & Cloud
   {
     icon: mdiGit,
     label: "Git",
-    category: "Tools",
+    category: "DevOps & Cloud",
     color: "#F05032", // Git red/orange
   },
   {
     icon: mdiDocker,
     label: "Docker",
-    category: "Tools",
+    category: "DevOps & Cloud",
     color: "#2496ED", // Docker blue
+  },
+
+  // 🚀 DevOps & Cloud
+  {
+    icon: mdiRocket,
+    label: "Fastlane",
+    category: "DevOps & Cloud",
+    color: "#00D4AA", // Fastlane teal
+  },
+  {
+    icon: mdiSourcePull,
+    label: "GitHub Actions",
+    category: "DevOps & Cloud",
+    color: "#2088FF", // GitHub blue
+  },
+  {
+    icon: mdiCogs,
+    label: "CI/CD Pipelines",
+    category: "DevOps & Cloud",
+    color: "#FF6B35", // Orange
+  },
+
+  // 🧪 Testing & QA
+  {
+    icon: mdiTestTube,
+    label: "Jest",
+    category: "Testing & QA",
+    color: "#C21325", // Jest red
+  },
+  {
+    icon: mdiBug,
+    label: "Detox",
+    category: "Testing & QA",
+    color: "#61DAFB", // React Native blue
+  },
+  {
+    icon: mdiTestTube,
+    label: "Cypress",
+    category: "Testing & QA",
+    color: "#17202C", // Cypress dark
   },
 ];

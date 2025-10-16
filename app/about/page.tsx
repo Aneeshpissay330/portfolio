@@ -4,10 +4,10 @@ import Link from "next/link";
 
 export default function About() {
     return (
-        <section id="about" className="py-20 bg-white">
-            <div className="container mx-auto px-6">
+        <section id="about" className="spacing-section bg-background">
+            <div className="container mx-auto spacing-container">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl font-bold text-center mb-16 text-black">
+                    <h2 className="text-3xl font-bold text-center mb-16 text-foreground">
                         About Me
                     </h2>
 
@@ -15,14 +15,14 @@ export default function About() {
                         {/* Left: Bio + Button */}
                         <div className="space-y-6">
                            {about.bio.map((paragraph, index) => (
-                                <p key={index} className="text-gray-600 text-lg leading-relaxed">
+                                <p key={index} className="text-muted-foreground text-lg leading-relaxed">
                                     {paragraph}
                                 </p>
                            ))}
                             {/* Button to Skills Page */}
                             <Link
                                 href="/skills"
-                                className="inline-block bg-black text-white px-8 py-3 border border-black hover:bg-gray-900 transition-colors font-medium cursor-pointer"
+                                className="btn-accent px-8 py-3 transition-colors font-medium cursor-pointer rounded-sm inline-block"
                             >
                                 View Skills
                             </Link>
@@ -31,7 +31,7 @@ export default function About() {
                         {/* Right: Image */}
                         <div className="flex justify-center">
                             <div className="relative">
-                                <div className="w-80 h-80 bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
+                                <div className="w-80 h-80 bg-secondary border border-border glass-effect flex items-center justify-center overflow-hidden">
                                     <Image
                                         src={about.profileImage}
                                         alt="Profile"

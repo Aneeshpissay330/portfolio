@@ -1,8 +1,7 @@
-import SkillCard from "@/components/SkillCard";
-import { Footer, NextHeader } from "@Aneeshpissay330/components-ui";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
-import { mdiGithub, mdiLinkedin } from '@mdi/js';
 import "./globals.css";
 
 const lexend = Lexend({
@@ -35,27 +34,9 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} antialiased`}
       >
-        <NextHeader
+        <Header
           title="Aneesh Pissay"
           navLinks={navLinks}
-          rightContent={
-            <div className="flex items-center space-x-4">
-              <SkillCard 
-                icon={mdiGithub}
-                size={40}
-                border={false}
-                href="https://github.com/Aneeshpissay330"
-                color="#181717"
-              />
-              <SkillCard 
-                icon={mdiLinkedin}
-                size={40}
-                border={false}
-                href="https://www.linkedin.com/in/aneesh-pissay-1559a31a9"
-                color="#0A66C2"
-              />
-            </div>
-          }
         />
         {children}
         <Footer

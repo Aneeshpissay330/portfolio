@@ -23,9 +23,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   privacyPolicy,
 }) => {
   return (
-    <div className="bg-white border border-gray-200 hover:border-gray-300 transition-colors">
+    <div className="bg-card border border-border hover:border-muted-foreground transition-colors glass-effect">
       {/* Project Image */}
-      <div className="h-48 bg-gray-100 border-b border-gray-200">
+      <div className="h-48 bg-secondary border-b border-border">
         <Image
           src={image}
           alt={title}
@@ -36,12 +36,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       </div>
 
       {/* Project Details */}
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-black mb-2">{title}</h3>
+      <div className="spacing-generous">
+        <h3 className="text-xl font-bold text-foreground mb-2">{title}</h3>
 
         {/* Description (clamped, tooltip on hover) */}
         <p
-          className="text-gray-600 mb-4 text-sm leading-relaxed line-clamp-2"
+          className="text-muted-foreground mb-4 text-sm leading-relaxed line-clamp-2"
           title={description}
         >
           {description}
@@ -52,7 +52,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           {tags.map((tag, i) => (
             <span
               key={i}
-              className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded"
+              className="bg-secondary text-muted-foreground px-2 py-1 text-xs rounded-sm"
             >
               {tag}
             </span>
@@ -66,7 +66,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               href={demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-black hover:text-accent transition-colors text-sm font-medium flex items-center"
+              className="text-foreground hover:text-accent transition-colors text-sm font-medium flex items-center"
             >
               <Icon path={mdiOpenInNew} size={0.7} className="mr-1" />
               Live Demo
@@ -77,7 +77,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 hover:text-black transition-colors text-sm flex items-center"
+              className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center"
             >
               <Icon path={mdiGithub} size={0.7} className="mr-1" />
               GitHub
@@ -86,7 +86,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           {privacyPolicy && (
             <Link
               href={privacyPolicy}
-              className="text-red-600 hover:text-red-800 transition-colors text-sm flex items-center font-medium"
+              className="text-accent hover:text-destructive transition-colors text-sm flex items-center font-medium"
             >
               <Icon path={mdiShieldAccount} size={0.7} className="mr-1" />
               Privacy Policy
