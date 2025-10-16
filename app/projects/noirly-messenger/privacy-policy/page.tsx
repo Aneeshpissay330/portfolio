@@ -3,8 +3,6 @@ import './privacy-policy.css';
 export default function NoirlyMessengerPrivacyPolicy() {
   return (
     <div className="min-h-screen bg-white">
-      <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-      
       <div className="privacy-body">
         <div className="privacy-container">
           <h1 className="privacy-h1">Privacy Policy</h1>
@@ -12,7 +10,7 @@ export default function NoirlyMessengerPrivacyPolicy() {
           
           <div className="privacy-section">
             <h2 className="privacy-h2">Overview</h2>
-            <p>This Privacy Policy describes how <strong>Aneesh Pissay</strong> ("I", "me", or "my") collects, uses, and shares information for the mobile application <span className="privacy-highlight">"Noirly Messenger"</span> (the "App"). This App is developed and published by an individual hobby developer.</p>
+            <p>This Privacy Policy describes how <strong>Aneesh Pissay</strong> (&quot;I&quot;, &quot;me&quot;, or &quot;my&quot;) collects, uses, and shares information for the mobile application <span className="privacy-highlight">&quot;Noirly Messenger&quot;</span> (the &quot;App&quot;). This App is developed and published by an individual hobby developer.</p>
           </div>
 
           <div className="privacy-section">
@@ -81,7 +79,7 @@ export default function NoirlyMessengerPrivacyPolicy() {
           </div>
 
           <div className="privacy-section">
-            <h2 className="privacy-h2">7. Children's Privacy</h2>
+            <h2 className="privacy-h2">7. Children&apos;s Privacy</h2>
             <p>The App is not directed to children under 13. I do not knowingly collect personal information from children under 13.</p>
           </div>
 
@@ -92,7 +90,7 @@ export default function NoirlyMessengerPrivacyPolicy() {
 
           <div className="privacy-section">
             <h2 className="privacy-h2">9. Changes to This Policy</h2>
-            <p>I may update this Privacy Policy; the "Last updated" date above will reflect changes.</p>
+            <p>I may update this Privacy Policy; the &quot;Last updated&quot; date above will reflect changes.</p>
           </div>
 
           <div className="privacy-section">

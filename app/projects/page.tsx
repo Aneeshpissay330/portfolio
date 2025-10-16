@@ -13,14 +13,11 @@ export default function Projects() {
     const [mobilePage, setMobilePage] = useState(1);
     const projectsPerPage = 9;
 
-    // Get unique categories from projects array
-    const categories = Array.from(new Set(projects.map((p) => p.category)));
-
-    // Icon mapping for project categories
-    const categoryIcons = {
-        "Web": mdiWeb,
-        "Mobile": mdiCellphone
-    };
+    // Icon mapping for project categories (if needed in future)
+    // const categoryIcons = {
+    //     "Web": mdiWeb,
+    //     "Mobile": mdiCellphone
+    // };
 
     const paginateProjects = (projectList: typeof projects, currentPage: number) => {
         const startIndex = (currentPage - 1) * projectsPerPage;
