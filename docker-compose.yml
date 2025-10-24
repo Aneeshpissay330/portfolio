@@ -1,20 +1,13 @@
-version: "3.8"
+version: "3"
 
 services:
-  portfolio:
-    image: aneeshpissay/portfolio:latest
-    # OR build: .
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=${NODE_ENV:-production}
-      - PORT=${PORT:-3000}
-    # optionally:
-    # network_mode: "bridge"
+  web:
+    image: aneeshpissay/portfolio
+    networks:
+      - caddy_network
 
   caddy:
-    image: caddy:latest
+    image: caddy:2
     restart: unless-stopped
     ports:
       - "80:80"
@@ -23,15 +16,12 @@ services:
       - /root/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
-    environment:
-      - DOMAIN=aneesh-pissay.cloud
-    depends_on:
-      - portfolio
+    networks:
+      - caddy_network
 
-# Force the default network to use the bridge driver (prevents overlay/stack networks)
 networks:
-  default:
-    driver: bridge
+  caddy_network:
+    driver: overlay
 
 volumes:
   caddy_data:
