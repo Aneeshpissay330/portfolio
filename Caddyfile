@@ -1,0 +1,17 @@
+{
+    # email used for Let's Encrypt registration & notifications
+    email aneeshpissay330@gmail.com
+}
+
+aneesh-pissay.cloud {
+    reverse_proxy portfolio:3000
+    encode zstd gzip
+    log {
+        output file /data/access.log
+        format single_field
+    }
+}
+
+www.aneesh-pissay.cloud {
+    redir https://aneesh-pissay.cloud{uri} permanent
+}
