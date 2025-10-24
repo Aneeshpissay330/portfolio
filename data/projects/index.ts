@@ -54,7 +54,7 @@ export const projects = [
     {
         title: "Noirly Messenger",
         description: "A modern messaging app with real-time chat, media sharing, voice/video calls, and secure authentication. Built with React Native and Firebase.",
-        technologies: ["React Native", "TypeScript", "Firebase", "WebRTC", "Notifee"],
+        technologies: ["React Native", "TypeScript", "Firebase", "Notifee"],
         image: noirlyMessengerImage,
         url: "https://play.google.com/store/apps/details?id=com.aneesh.noirly.messenger",
         githubUrl: "https://github.com/Aneeshpissay330/noirly-messenger",
