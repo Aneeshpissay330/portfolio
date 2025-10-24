@@ -21,7 +21,7 @@ services:
 
 networks:
   caddy_network:
-    driver: overlay
+    driver: bridge
 
 volumes:
   caddy_data:
