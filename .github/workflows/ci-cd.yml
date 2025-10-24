@@ -106,7 +106,7 @@ jobs:
                   - PORT=3000
                 labels:
                   - "traefik.enable=true"
-                  - "traefik.http.routers.next.rule=Host(\`${DOMAIN}\`)"
+                  - "traefik.http.routers.next.rule=Host(${DOMAIN})"
                   - "traefik.http.routers.next.entrypoints=websecure"
                   - "traefik.http.routers.next.tls.certresolver=myresolver"
                   - "traefik.http.services.next.loadbalancer.server.port=3000"
