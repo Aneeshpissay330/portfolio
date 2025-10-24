@@ -9,6 +9,22 @@ on:
 permissions:
   contents: read
 
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Hostinger via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_KEY }}
+          port: 22
+          script: |
+            cd /path/to/your/project # update to your Hostinger project path
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:latest
+            docker stack deploy -c docker-compose.yml portfolio
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
