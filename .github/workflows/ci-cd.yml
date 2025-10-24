@@ -1,72 +1,61 @@
-name: CI / CD — Build & Push Docker image to Docker Hub
+name: CI/CD — Build Docker, Push to Docker Hub, Deploy to Hostinger
+
+on:
+  push:
+    branches: [ master ]
 
 permissions:
   contents: read
+  packages: write
+  id-token: write
 
-          port: 22
-          script: |
-            cd /path/to/your/project # update to your Hostinger project path
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:latest
-            docker stack deploy -c docker-compose.yml portfolio
+env:
+  IMAGE_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/portfolio
+
 jobs:
-  build-and-push:
+  build_and_push:
+    name: Build & Push Docker image
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/portfolio  # replace repo name or set as secret
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      - name: Set up QEMU (for multi-platform builds)
+        uses: docker/setup-qemu-action@v2
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: |
-          if [ -f package.json ] && jq -e '.scripts.test' package.json >/dev/null 2>&1; then
-            npm test
-          else
-            echo "No test script found, skipping tests"
-          fi
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          # optional build args:
+            ${{ env.IMAGE_REPO }}:latest
+            ${{ env.IMAGE_REPO }}:${{ github.sha }}
 
-  deploy:
-    needs: build-and-push
+      - name: Save image info
+        run: echo "IMAGE=${{ env.IMAGE_REPO }}:latest" >> $GITHUB_ENV
+
+  deploy_hostinger:
+    name: Deploy to Hostinger
+    needs: build_and_push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Hostinger via SSH
-        uses: appleboy/ssh-action@v0.1.10
+      - name: Deploy to Hostinger VM
+        uses: hostinger/deploy-action@v1
         with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USER }}
-          key: ${{ secrets.HOSTINGER_KEY }}
-          port: 22
-          script: |
-            cd /path/to/your/project # update to your Hostinger project path
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:latest
-            docker stack deploy -c docker-compose.yml portfolio
-          build-args: |
-            NODE_ENV=production
+          api-key: ${{ secrets.HOSTINGER_API_KEY }}
+          virtual-machine: ${{ secrets.HOSTINGER_VM_ID }}
 
-      - name: Output pushed image tags
-        run: echo "Pushed ${{ env.IMAGE_NAME }}:latest and ${{ env.IMAGE_NAME }}:${{ github.sha }}"
+      - name: Post-deploy info
+        run: |
+          echo "Deployed $IMAGE to Hostinger VM ${{ secrets.HOSTINGER_VM_ID }}"
