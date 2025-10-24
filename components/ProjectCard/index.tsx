@@ -10,7 +10,6 @@ interface ProjectCardProps {
   tags: string[];
   demoUrl?: string;
   githubUrl?: string;
-  privacyPolicy?: string;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -20,7 +19,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   tags,
   demoUrl,
   githubUrl,
-  privacyPolicy,
 }) => {
   return (
     <div className="bg-card border border-border hover:border-muted-foreground transition-colors glass-effect">
@@ -82,15 +80,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               <Icon path={mdiGithub} size={0.7} className="mr-1" />
               GitHub
             </a>
-          )}
-          {privacyPolicy && (
-            <Link
-              href={privacyPolicy}
-              className="text-accent hover:text-destructive transition-colors text-sm flex items-center font-medium"
-            >
-              <Icon path={mdiShieldAccount} size={0.7} className="mr-1" />
-              Privacy Policy
-            </Link>
           )}
         </div>
       </div>

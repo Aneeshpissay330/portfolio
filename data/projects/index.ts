@@ -56,9 +56,8 @@ export const projects = [
         description: "A modern messaging app with real-time chat, media sharing, voice/video calls, and secure authentication. Built with React Native and Firebase.",
         technologies: ["React Native", "TypeScript", "Firebase", "WebRTC", "Notifee"],
         image: noirlyMessengerImage,
-        url: "https://play.google.com/store/apps/details?id=com.noirly.messenger",
+        url: "https://play.google.com/store/apps/details?id=com.aneesh.noirly.messenger",
         githubUrl: "https://github.com/Aneeshpissay330/noirly-messenger",
-        privacyPolicy: "/projects/noirly-messenger/privacy-policy",
         category: "Mobile"
     }
 ];

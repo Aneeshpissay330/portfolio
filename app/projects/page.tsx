@@ -107,7 +107,6 @@ export default function Projects() {
                                     tags={project.technologies}
                                     demoUrl={project.url}
                                     githubUrl={project.githubUrl}
-                                    privacyPolicy={project.privacyPolicy}
                                     key={index}
                                 />
                             ))}
@@ -125,7 +124,6 @@ export default function Projects() {
                                     tags={project.technologies}
                                     demoUrl={project.url}
                                     githubUrl={project.githubUrl}
-                                    privacyPolicy={project.privacyPolicy}
                                     key={index}
                                 />
                             ))}
