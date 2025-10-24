@@ -1,25 +1,8 @@
 name: CI / CD — Build & Push Docker image to Docker Hub
 
-on:
-  push:
-    branches:
-      - master
-  workflow_dispatch:
-
 permissions:
   contents: read
 
-
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to Hostinger via SSH
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USER }}
-          key: ${{ secrets.HOSTINGER_KEY }}
           port: 22
           script: |
             cd /path/to/your/project # update to your Hostinger project path
@@ -66,6 +49,22 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
           # optional build args:
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Hostinger via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_KEY }}
+          port: 22
+          script: |
+            cd /path/to/your/project # update to your Hostinger project path
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:latest
+            docker stack deploy -c docker-compose.yml portfolio
           build-args: |
             NODE_ENV=production
 
