@@ -6,7 +6,7 @@ on:
 
 env:
   # repo short name
-  REPO_NAME: aneeshpissay/portfolio
+  REPO_NAME: portfolio
   IMAGE_TAG: ${{ github.sha }}
   TIMESTAMP: ${{ github.run_id }}
 
