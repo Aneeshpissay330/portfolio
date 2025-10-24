@@ -2,13 +2,11 @@ name: CI / Build / Push / Deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
-  # repo short name
-  REPO_NAME: portfolio
+  REPO_NAME: ${{ github.event.repository.name }}
   IMAGE_TAG: ${{ github.sha }}
-  TIMESTAMP: ${{ github.run_id }}
 
 jobs:
   build-and-push:
@@ -19,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Set up Buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Login to DockerHub
@@ -28,100 +26,101 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        id: build-image
+      - name: Build and push image
+        id: build
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
+          file: ./Dockerfile
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-          file: ./Dockerfile
 
-      - name: Set image output
+      - name: Set image ref
         id: set-image
-        run: |
-          echo "image_ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
+        run: echo "image_ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
-  deploy-to-host:
-    name: Deploy to Hostinger via SSH
+  deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Prepare environment
-        run: |
-          echo "Preparing deploy to SSH host ${SSH_HOST:=31.97.228.115}"
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-
-      - name: Create remote docker-compose and deploy
-        # Using appleboy/ssh-action to run multiple remote commands
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT || '22' }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # Optional: known_hosts can be sent here; appleboy works without it but for hardened security add known_hosts
           script: |
             set -e
-
-            # Ensure docker is installed (if not, install)
-            if ! command -v docker >/dev/null 2>&1; then
-              echo "Docker not found. Installing Docker..."
-              curl -fsSL https://get.docker.com | sh
-              # allow current user to run docker: (this requires relogin, but for script we'll use sudo docker)
-            fi
-
-            if ! command -v docker-compose >/dev/null 2>&1; then
-              echo "docker-compose not found. Installing docker-compose..."
-              # try plugin
-              DOCKER_COMPOSE_PLUGIN="$HOME/.docker/cli-plugins/docker-compose"
-              mkdir -p "$(dirname "$DOCKER_COMPOSE_PLUGIN")"
-              curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o "$DOCKER_COMPOSE_PLUGIN"
-              chmod +x "$DOCKER_COMPOSE_PLUGIN"
-              echo "Installed docker-compose plugin at $DOCKER_COMPOSE_PLUGIN"
-            fi
-
-            # Create a project directory
             DEPLOY_DIR=~/next_app_deploy
-            mkdir -p "$DEPLOY_DIR"
-            cd "$DEPLOY_DIR"
+            IMAGE_REF='${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}'
 
-            # Write docker-compose.yml (the Action writes this dynamically; IMAGE will be the pushed image)
+            if ! command -v docker >/dev/null; then
+              curl -fsSL https://get.docker.com | sh
+            fi
+            if ! command -v docker-compose >/dev/null; then
+              mkdir -p ~/.docker/cli-plugins
+              curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o ~/.docker/cli-plugins/docker-compose
+              chmod +x ~/.docker/cli-plugins/docker-compose
+            fi
+
+            mkdir -p "$DEPLOY_DIR" && cd "$DEPLOY_DIR"
+
+            # free ports 80/443 if occupied
+            for port in 80 443; do
+              if sudo ss -ltnp | grep -q ":$port"; then
+                echo "Port $port occupied — stopping processes..."
+                sudo fuser -k "$port"/tcp || true
+              fi
+            done
+
             cat > docker-compose.yml <<'EOF'
             version: "3.8"
-
             services:
+              traefik:
+                image: traefik:v3.1
+                container_name: traefik
+                restart: always
+                command:
+                  - "--providers.docker=true"
+                  - "--providers.docker.exposedbydefault=false"
+                  - "--entrypoints.web.address=:80"
+                  - "--entrypoints.websecure.address=:443"
+                  - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+                  - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+                  - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+                  - "--log.level=INFO"
+                ports:
+                  - "80:80"
+                  - "443:443"
+                volumes:
+                  - "/var/run/docker.sock:/var/run/docker.sock:ro"
+                  - "./letsencrypt:/letsencrypt"
               web:
                 image: ${IMAGE}
                 restart: always
                 environment:
                   - NODE_ENV=production
                   - PORT=3000
-                ports:
-                  - "80:3000"
-                healthcheck:
-                  test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3000 || exit 1"]
-                  interval: 30s
-                  timeout: 5s
-                  retries: 3
+                labels:
+                  - "traefik.enable=true"
+                  - "traefik.http.routers.next.rule=Host(\`${DOMAIN}\`)"
+                  - "traefik.http.routers.next.entrypoints=websecure"
+                  - "traefik.http.routers.next.tls.certresolver=myresolver"
+                  - "traefik.http.services.next.loadbalancer.server.port=3000"
             EOF
 
-            # Replace ${IMAGE} placeholder with the actual image name passed from the GitHub action
-            IMAGE_REF='${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}'
             sed -i "s|\${IMAGE}|$IMAGE_REF|g" docker-compose.yml
+            sed -i "s|\${DOMAIN}|${{ secrets.DOMAIN }}|g" docker-compose.yml
+            sed -i "s|\${LETSENCRYPT_EMAIL}|${{ secrets.LETSENCRYPT_EMAIL }}|g" docker-compose.yml
 
-            echo "docker-compose.yml written:"
+            echo "Compose file:"
             cat docker-compose.yml
 
-            # Pull the image and run
+            docker compose down --remove-orphans || true
             docker compose pull || true
             docker compose up -d --remove-orphans
 
-            # show logs (tail) for quick check
-            docker compose ps
-            sleep 2
-            docker compose logs --tail 50
-
+            docker ps

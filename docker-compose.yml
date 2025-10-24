@@ -1,18 +1,36 @@
 version: "3.8"
 
 services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+
   web:
-    image: ${IMAGE:-"REPLACE_WITH_IMAGE"}
+    image: ${IMAGE}
+    container_name: next_app
     restart: always
     environment:
       - NODE_ENV=production
       - PORT=3000
-    ports:
-      - "80:3000"     # maps host port 80 to the Next.js app port 3000
-    volumes:
-      - .next:/app/.next  # optional for development, in prod the image already contains .next
-    healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3000 || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.next.entrypoints=websecure"
+      - "traefik.http.routers.next.tls.certresolver=myresolver"
+      - "traefik.http.services.next.loadbalancer.server.port=3000"
