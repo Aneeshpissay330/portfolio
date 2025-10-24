@@ -1,126 +1,67 @@
-name: CI / Build / Push / Deploy
+name: Next.js CI/CD to Hostinger
 
 on:
   push:
-    branches: [ master ]
-
-env:
-  REPO_NAME: ${{ github.event.repository.name }}
-  IMAGE_TAG: ${{ github.sha }}
+    branches:
+      - master # Trigger on pushes to the master branch
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    outputs:
-      image_ref: ${{ steps.set-image.outputs.image_ref }}
     steps:
-      - name: Checkout
+      - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
+      - name: 🔑 Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push image
-        id: build
-        uses: docker/build-push-action@v4
+      - name: ⚙️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        id: docker_build
         with:
           context: .
-          push: true
           file: ./Dockerfile
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
-
-      - name: Set image ref
-        id: set-image
-        run: echo "image_ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
-
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.7
+          push: true
+          tags: ${{ secrets.IMAGE_NAME }}:${{ github.sha }},${{ secrets.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          
+      - name: 🚀 SSH and Deploy to Hostinger VPS
+        uses: appleboy/ssh-action@v1.0.1
         with:
           host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT || '22' }}
-          username: ${{ secrets.SSH_USER }}
+          username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -e
-            DEPLOY_DIR=~/next_app_deploy
-            IMAGE_REF='${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}'
+            # 1. Login to Docker Hub on the VPS (if using a private repo, otherwise skip)
+            # docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
 
-            if ! command -v docker >/dev/null; then
-              curl -fsSL https://get.docker.com | sh
-            fi
-            if ! command -v docker-compose >/dev/null; then
-              mkdir -p ~/.docker/cli-plugins
-              curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o ~/.docker/cli-plugins/docker-compose
-              chmod +x ~/.docker/cli-plugins/docker-compose
-            fi
+            # 2. Define image name and latest tag
+            IMAGE_NAME=${{ secrets.IMAGE_NAME }}
+            TAG=latest
 
-            mkdir -p "$DEPLOY_DIR" && cd "$DEPLOY_DIR"
+            # 3. Stop and remove the old container (if running)
+            docker stop $IMAGE_NAME || true
+            docker rm $IMAGE_NAME || true
 
-            # free ports 80/443 if occupied
-            for port in 80 443; do
-              if sudo ss -ltnp | grep -q ":$port"; then
-                echo "Port $port occupied — stopping processes..."
-                sudo fuser -k "$port"/tcp || true
-              fi
-            done
+            # 4. Pull the new image from Docker Hub
+            docker pull $IMAGE_NAME:$TAG
 
-            cat > docker-compose.yml <<'EOF'
-            version: "3.8"
-            services:
-              traefik:
-                image: traefik:v3.1
-                container_name: traefik
-                restart: always
-                command:
-                  - "--providers.docker=true"
-                  - "--providers.docker.exposedbydefault=false"
-                  - "--entrypoints.web.address=:80"
-                  - "--entrypoints.websecure.address=:443"
-                  - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-                  - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
-                  - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-                  - "--log.level=INFO"
-                ports:
-                  - "80:80"
-                  - "443:443"
-                volumes:
-                  - "/var/run/docker.sock:/var/run/docker.sock:ro"
-                  - "./letsencrypt:/letsencrypt"
-              web:
-                image: ${IMAGE}
-                restart: always
-                environment:
-                  - NODE_ENV=production
-                  - PORT=3000
-                labels:
-                  - "traefik.enable=true"
-                  - "traefik.http.routers.next.rule=Host(${DOMAIN})"
-                  - "traefik.http.routers.next.entrypoints=websecure"
-                  - "traefik.http.routers.next.tls.certresolver=myresolver"
-                  - "traefik.http.services.next.loadbalancer.server.port=3000"
-            EOF
+            # 5. Run the new container
+            # Maps VPS port 80 to container port 3000 (Next.js default)
+            docker run -d \
+              --name $IMAGE_NAME \
+              -p 8080:3000 \
+              --restart always \
+              $IMAGE_NAME:$TAG
 
-            sed -i "s|\${IMAGE}|$IMAGE_REF|g" docker-compose.yml
-            sed -i "s|\${DOMAIN}|${{ secrets.DOMAIN }}|g" docker-compose.yml
-            sed -i "s|\${LETSENCRYPT_EMAIL}|${{ secrets.LETSENCRYPT_EMAIL }}|g" docker-compose.yml
-
-            echo "Compose file:"
-            cat docker-compose.yml
-
-            docker compose down --remove-orphans || true
-            docker compose pull || true
-            docker compose up -d --remove-orphans
-
-            docker ps
+            # 6. Clean up old images to save space
+            docker image prune -f
+            
+            echo "Deployment complete! Application running on port 8080 of the VPS."
