@@ -1,44 +1,35 @@
-# Stage 1 — install deps & build
+# Stage 1: build
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-# install deps faster: copy package manifests first (cache)
+# If you use pnpm/yarn, adjust accordingly. Using npm here.
 COPY package*.json ./
-# If you use pnpm/yarn, adapt accordingly
-RUN npm ci --silent
+# install deps
+RUN npm ci
 
-# copy rest of source and build
+# copy rest and build
 COPY . .
 RUN npm run build
 
-# Stage 2 — production image
+# Stage 2: runtime
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-# copy only what's needed from builder
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-
-
-
-# Install production deps
-RUN npm ci --only=production --silent
-
-# expose port (Next default)
-
+ENV NODE_ENV=production
 ENV PORT=3000
+
+# install a very small runtime-only deps if any (not needed usually)
+COPY package*.json ./
+RUN npm ci --production
+
+# copy built app
+COPY --from=builder /app/.next .next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/next.config.ts ./
+COPY --from=builder /app/package.json ./
+
 EXPOSE 3000
 
-
-# Ensure .next/cache/images exists and is writable
-RUN mkdir -p /app/.next/cache/images && chown -R appuser:appgroup /app/.next
-
-USER appuser
-# Use NODE_ENV=production by default
-ENV NODE_ENV=production
-
-# Start Next in production mode
-CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "3000"]
+# use the start script that should be in package.json: "start": "next start -p $PORT"
+CMD ["npm", "run", "start"]

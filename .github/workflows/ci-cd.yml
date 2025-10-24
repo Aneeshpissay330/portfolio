@@ -1,61 +1,127 @@
-name: CI/CD — Build Docker, Push to Docker Hub, Deploy to Hostinger
+name: CI / Build / Push / Deploy
 
 on:
   push:
     branches: [ master ]
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-
 env:
-  IMAGE_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/portfolio
+  # repo short name
+  REPO_NAME: aneeshpissay/portfolio
+  IMAGE_TAG: ${{ github.sha }}
+  TIMESTAMP: ${{ github.run_id }}
 
 jobs:
-  build_and_push:
-    name: Build & Push Docker image
+  build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      image_ref: ${{ steps.set-image.outputs.image_ref }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Set up QEMU (for multi-platform builds)
-        uses: docker/setup-qemu-action@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Log in to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
+        id: build-image
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_REPO }}:latest
-            ${{ env.IMAGE_REPO }}:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          file: ./Dockerfile
 
-      - name: Save image info
-        run: echo "IMAGE=${{ env.IMAGE_REPO }}:latest" >> $GITHUB_ENV
+      - name: Set image output
+        id: set-image
+        run: |
+          echo "image_ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
-  deploy_hostinger:
-    name: Deploy to Hostinger
-    needs: build_and_push
+  deploy-to-host:
+    name: Deploy to Hostinger via SSH
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Hostinger VM
-        uses: hostinger/deploy-on-vps@v2
-        with:
-          api-key: ${{ secrets.HOSTINGER_API_KEY }}
-          virtual-machine: ${{ secrets.HOSTINGER_VM_ID }}
-
-      - name: Post-deploy info
+      - name: Prepare environment
         run: |
-          echo "Deployed $IMAGE to Hostinger VM ${{ secrets.HOSTINGER_VM_ID }}"
+          echo "Preparing deploy to SSH host ${SSH_HOST:=31.97.228.115}"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: Create remote docker-compose and deploy
+        # Using appleboy/ssh-action to run multiple remote commands
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # Optional: known_hosts can be sent here; appleboy works without it but for hardened security add known_hosts
+          script: |
+            set -e
+
+            # Ensure docker is installed (if not, install)
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "Docker not found. Installing Docker..."
+              curl -fsSL https://get.docker.com | sh
+              # allow current user to run docker: (this requires relogin, but for script we'll use sudo docker)
+            fi
+
+            if ! command -v docker-compose >/dev/null 2>&1; then
+              echo "docker-compose not found. Installing docker-compose..."
+              # try plugin
+              DOCKER_COMPOSE_PLUGIN="$HOME/.docker/cli-plugins/docker-compose"
+              mkdir -p "$(dirname "$DOCKER_COMPOSE_PLUGIN")"
+              curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" -o "$DOCKER_COMPOSE_PLUGIN"
+              chmod +x "$DOCKER_COMPOSE_PLUGIN"
+              echo "Installed docker-compose plugin at $DOCKER_COMPOSE_PLUGIN"
+            fi
+
+            # Create a project directory
+            DEPLOY_DIR=~/next_app_deploy
+            mkdir -p "$DEPLOY_DIR"
+            cd "$DEPLOY_DIR"
+
+            # Write docker-compose.yml (the Action writes this dynamically; IMAGE will be the pushed image)
+            cat > docker-compose.yml <<'EOF'
+            version: "3.8"
+
+            services:
+              web:
+                image: ${IMAGE}
+                restart: always
+                environment:
+                  - NODE_ENV=production
+                  - PORT=3000
+                ports:
+                  - "80:3000"
+                healthcheck:
+                  test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3000 || exit 1"]
+                  interval: 30s
+                  timeout: 5s
+                  retries: 3
+            EOF
+
+            # Replace ${IMAGE} placeholder with the actual image name passed from the GitHub action
+            IMAGE_REF='${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}'
+            sed -i "s|\${IMAGE}|$IMAGE_REF|g" docker-compose.yml
+
+            echo "docker-compose.yml written:"
+            cat docker-compose.yml
+
+            # Pull the image and run
+            docker compose pull || true
+            docker compose up -d --remove-orphans
+
+            # show logs (tail) for quick check
+            docker compose ps
+            sleep 2
+            docker compose logs --tail 50
+

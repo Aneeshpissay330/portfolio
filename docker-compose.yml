@@ -1,28 +1,18 @@
-version: "3"
+version: "3.8"
 
 services:
   web:
-    image: aneeshpissay/portfolio
-    networks:
-      - caddy_network
-
-  caddy:
-    image: caddy:2
-    restart: unless-stopped
+    image: ${IMAGE:-"REPLACE_WITH_IMAGE"}
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:3000"     # maps host port 80 to the Next.js app port 3000
     volumes:
-      - /root/Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - caddy_network
-
-networks:
-  caddy_network:
-    driver: bridge
-
-volumes:
-  caddy_data:
-  caddy_config:
+      - .next:/app/.next  # optional for development, in prod the image already contains .next
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
