@@ -8,9 +8,8 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-    # If you need volumes, uncomment and edit:
-    # volumes:
-    #   - ./data:/app/data
+    networks:
+      - portfolio_existing
 
 networks:
   portfolio_existing:
