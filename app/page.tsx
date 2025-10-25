@@ -1,4 +1,5 @@
-import Link from "next/link";
+
+import LinkButton from "../components/ui/link-button";
 
 export default function Home() {
   return (
@@ -17,9 +18,9 @@ export default function Home() {
             app development. Turning ideas into digital experiences.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/projects" className="btn-accent px-8 py-3 transition-colors font-medium cursor-pointer rounded-sm">
+            <LinkButton href="/projects">
               View Projects
-            </Link>
+            </LinkButton>
           </div>
         </div>
       </div>

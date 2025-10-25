@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${lexend.variable} antialiased`}
+        className={`${lexend.variable} antialiased glass-effect`}
       >
         <Header
           title="Aneesh Pissay"

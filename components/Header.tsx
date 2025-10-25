@@ -1,5 +1,6 @@
 "use client";
 
+import LinkButton from "./ui/link-button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu";
@@ -20,13 +21,13 @@ export function Header({ title, navLinks }: HeaderProps) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 glass-effect border-b border-border spacing-generous">
+  <header className="sticky top-0 z-50 glass-effect border-b spacing-generous" style={{ borderBottomColor: '#222', borderBottomWidth: 1, borderBottomStyle: 'solid' }}>
       <div className="container mx-auto spacing-container">
         <div className="flex items-center justify-between h-16">
           {/* Logo/Title */}
-          <Link href="/" className="text-xl font-bold text-foreground hover:text-accent transition-colors">
+          <LinkButton href="/" accent={false} className="text-xl font-bold text-foreground hover:text-accent transition-colors px-6 py-3">
             {title}
-          </Link>
+          </LinkButton>
 
           {/* Navigation */}
           <NavigationMenu>

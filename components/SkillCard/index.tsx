@@ -1,4 +1,4 @@
-import Link from "next/link";
+import LinkButton from "../ui/link-button";
 import Icon from '@mdi/react';
 
 interface SkillCardProps {
@@ -33,11 +33,11 @@ const SkillCard: React.FC<SkillCardProps> = ({ icon, size = 80, border = true, h
     </div>
   );
 
-  // If href is provided, render <Link>, otherwise plain card
+  // If href is provided, render <LinkButton>, otherwise plain card
   return href ? (
-    <Link href={href} className="block cursor-pointer">
+    <LinkButton href={href} className="block cursor-pointer">
       {CardContent}
-    </Link>
+    </LinkButton>
   ) : (
     CardContent
   );
