@@ -1,7 +1,6 @@
-import Image, { StaticImageData } from "next/image";
-import Link from "next/link";
+import { mdiGithub, mdiOpenInNew } from '@mdi/js';
 import Icon from '@mdi/react';
-import { mdiOpenInNew, mdiGithub, mdiShieldAccount } from '@mdi/js';
+import Image, { StaticImageData } from "next/image";
 
 interface ProjectCardProps {
   title: string;
